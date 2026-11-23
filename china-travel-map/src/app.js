@@ -555,6 +555,9 @@
   }
 
   /* ---------------- city colors ---------------- */
+  const TRAVEL_IDLE = [20, 33, 31];
+  const TRAVEL_LOW = [49, 88, 78];
+
   function applyMonthColors() {
     const m = state.month;
     const live = state.mode === 'live';
@@ -572,15 +575,16 @@
         rgb = comfortColor(score);
         hot = score >= 88;
       } else {
-        const score = c.score[m];
-        rgb = c.baseRgb;
+        const score = Number(c.score[m]) || 0;
         if (score >= 70) {
-          const t = Math.pow(clamp((score - 70) / 29, 0, 1), 1.12);
-          rgb = mix(c.baseRgb, accentRgb, t * .84);
-          if (score >= 93) rgb = lighten(rgb, .18);
-          else if (score >= 85) rgb = lighten(rgb, .07);
+          const t = Math.pow(clamp((score - 70) / 29, 0, 1), .92);
+          rgb = mix(TRAVEL_LOW, accentRgb, t);
+          if (score >= 94) rgb = lighten(rgb, .16);
+          else if (score >= 86) rgb = lighten(rgb, .06);
+          hot = score >= 88;
+        } else {
+          rgb = TRAVEL_IDLE;
         }
-        hot = score >= 88;
       }
       c.el.style.fill = rgba(rgb, .97);
       c.el.classList.toggle('is-hot', hot);
@@ -1424,6 +1428,8 @@
   function applyModeUI() {
     const live = state.mode === 'live';
     const cost = state.mode === 'cost';
+    const travel = state.mode === 'travel';
+    document.body.classList.toggle('mode-travel', travel);
     document.body.classList.toggle('mode-live', live);
     document.body.classList.toggle('mode-cost', cost);
     modeButtons.forEach(btn => {
@@ -1431,8 +1437,8 @@
       btn.classList.toggle('is-active', on);
       btn.setAttribute('aria-selected', on ? 'true' : 'false');
     });
-    els.legendTitleText.textContent = cost ? '城市分域 · 非住房消费' : live ? '城市分域 · 体感舒适度' : '城市分域 · 各市独立设色';
-    els.legendHighlight.textContent = cost ? '暖色越亮 = 成本越高' : live ? '暖色越亮 = 越宜居' : '当季高亮 = 当月推荐';
+    els.legendTitleText.textContent = cost ? '城市分域 · 非住房消费' : live ? '城市分域 · 体感舒适度' : '城市分域 · 当月推荐';
+    els.legendHighlight.textContent = cost ? '暖色越亮 = 成本越高' : live ? '暖色越亮 = 越宜居' : '未推荐地区统一底色';
     els.legendHeatLabel.textContent = cost ? '生活成本' : live ? '体感舒适' : '推荐热度';
   }
 

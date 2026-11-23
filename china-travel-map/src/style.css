@@ -1345,6 +1345,11 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   box-shadow: none;
   font-weight: 600;
 }
+body.mode-travel .legend-heat {
+  background: linear-gradient(90deg, #31584e 0%, var(--accent) 100%);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), .28);
+}
+body.mode-travel .city-swatch { background: #1a2b28; }
 body.mode-live .legend-heat {
   background: linear-gradient(90deg, #294a57 0%, #4d8774 38%, #b7b170 68%, #f0d39a 100%);
   box-shadow: 0 0 8px rgba(222, 195, 125, .24);
