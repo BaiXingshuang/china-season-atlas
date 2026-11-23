@@ -555,13 +555,18 @@
   }
 
   /* ---------------- city colors ---------------- */
-  const TRAVEL_IDLE = [20, 33, 31];
-  const TRAVEL_LOW = [49, 88, 78];
+  const TRAVEL_IDLE_BASE = [9, 18, 17];
+
+  function travelPalette() {
+    const idle = mix(TRAVEL_IDLE_BASE, accentRgb, .18);
+    return { idle, low: mix(idle, accentRgb, .30) };
+  }
 
   function applyMonthColors() {
     const m = state.month;
     const live = state.mode === 'live';
     const cost = state.mode === 'cost';
+    const travel = travelPalette();
     CITIES.forEach(c => {
       if (!c.el) return;
       let rgb;
@@ -578,12 +583,12 @@
         const score = Number(c.score[m]) || 0;
         if (score >= 70) {
           const t = Math.pow(clamp((score - 70) / 29, 0, 1), .92);
-          rgb = mix(TRAVEL_LOW, accentRgb, t);
+          rgb = mix(travel.low, accentRgb, t);
           if (score >= 94) rgb = lighten(rgb, .16);
           else if (score >= 86) rgb = lighten(rgb, .06);
           hot = score >= 88;
         } else {
-          rgb = TRAVEL_IDLE;
+          rgb = travel.idle;
         }
       }
       c.el.style.fill = rgba(rgb, .97);
@@ -1208,6 +1213,9 @@
     root.setProperty('--accent', meta.accent);
     root.setProperty('--accent-rgb', accentRgb.join(','));
     root.setProperty('--accent-2', meta.accent2);
+    const tp = travelPalette();
+    root.setProperty('--travel-idle', rgba(tp.idle, 1));
+    root.setProperty('--travel-low', rgba(tp.low, 1));
 
     if (cost) {
       els.monthNum.textContent = '¥';

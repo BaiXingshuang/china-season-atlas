@@ -1353,10 +1353,10 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible {
   font-weight: 600;
 }
 body.mode-travel .legend-heat {
-  background: linear-gradient(90deg, #31584e 0%, var(--accent) 100%);
+  background: linear-gradient(90deg, var(--travel-low) 0%, var(--accent) 100%);
   box-shadow: 0 0 8px rgba(var(--accent-rgb), .28);
 }
-body.mode-travel .city-swatch { background: #1a2b28; }
+body.mode-travel .city-swatch { background: var(--travel-idle); }
 body.mode-live .legend-heat {
   background: linear-gradient(90deg, #294a57 0%, #4d8774 38%, #b7b170 68%, #f0d39a 100%);
   box-shadow: 0 0 8px rgba(222, 195, 125, .24);
@@ -2651,13 +2651,18 @@ body.mode-cost .legend-heat {
   }
 
   /* ---------------- city colors ---------------- */
-  const TRAVEL_IDLE = [20, 33, 31];
-  const TRAVEL_LOW = [49, 88, 78];
+  const TRAVEL_IDLE_BASE = [9, 18, 17];
+
+  function travelPalette() {
+    const idle = mix(TRAVEL_IDLE_BASE, accentRgb, .18);
+    return { idle, low: mix(idle, accentRgb, .30) };
+  }
 
   function applyMonthColors() {
     const m = state.month;
     const live = state.mode === 'live';
     const cost = state.mode === 'cost';
+    const travel = travelPalette();
     CITIES.forEach(c => {
       if (!c.el) return;
       let rgb;
@@ -2674,12 +2679,12 @@ body.mode-cost .legend-heat {
         const score = Number(c.score[m]) || 0;
         if (score >= 70) {
           const t = Math.pow(clamp((score - 70) / 29, 0, 1), .92);
-          rgb = mix(TRAVEL_LOW, accentRgb, t);
+          rgb = mix(travel.low, accentRgb, t);
           if (score >= 94) rgb = lighten(rgb, .16);
           else if (score >= 86) rgb = lighten(rgb, .06);
           hot = score >= 88;
         } else {
-          rgb = TRAVEL_IDLE;
+          rgb = travel.idle;
         }
       }
       c.el.style.fill = rgba(rgb, .97);
@@ -3304,6 +3309,9 @@ body.mode-cost .legend-heat {
     root.setProperty('--accent', meta.accent);
     root.setProperty('--accent-rgb', accentRgb.join(','));
     root.setProperty('--accent-2', meta.accent2);
+    const tp = travelPalette();
+    root.setProperty('--travel-idle', rgba(tp.idle, 1));
+    root.setProperty('--travel-low', rgba(tp.low, 1));
 
     if (cost) {
       els.monthNum.textContent = '¥';
