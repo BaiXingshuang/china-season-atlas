@@ -1,0 +1,5 @@
+﻿.tools/
+.chrome-*/
+__pycache__/
+*.pyc
+.edge-*/
